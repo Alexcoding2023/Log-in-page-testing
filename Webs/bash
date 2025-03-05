@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Set up AWS EC2 instance
+aws ec2 run-instances --image-id ami-0c94855ba95c38880 --count 1 --instance-type t2.micro --key-name your-key-pair --security-group-ids your-security-group-id
+
+# Configure Nginx and PHP
+ssh -i your-key-pair.pem ec2-user@your-ec2-public-ip "sudo yum update -y && sudo yum install nginx php php-fpm -y"
+sudo systemctl start nginx && sudo systemctl enable nginx
+
+# Upload frontend and backend files
+scp -i your-key-pair.pem frontend/ index.php backend/ your-ec2-user@your-ec2-public-ip:/var/www/html
+
+# Configure PHP to handle .php files
+ssh -i your-key-pair.pem ec2-user@your-ec2-public-ip "sudo sed -i 's/#;cgi.fix_pathinfo=0/cgi.fix_pathinfo=1/g' /etc/php.ini"
+sudo systemctl restart php-fpm

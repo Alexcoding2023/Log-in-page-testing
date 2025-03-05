@@ -1,0 +1,47 @@
+// malware.exe
+using System;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
+
+class Malware {
+    [DllImport("kernel32.dll", SetLastError = true)]
+    static extern bool CreateProcess(string lpApplicationName, string lpCommandLine, IntPtr lpProcessAttributes, IntPtr lpThreadAttributes, bool bInheritHandles, uint dwCreationFlags, IntPtr lpEnvironment, string lpCurrentDirectory, ref STARTUPINFO lpStartupInfo, out PROCESS_INFORMATION lpProcessInformation);
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct STARTUPINFO {
+        public Int32 cb;
+        public string lpReserved;
+        public string lpDesktop;
+        public string lpTitle;
+        public Int32 dwX;
+        public Int32 dwY;
+        public Int32 dwXSize;
+        public Int32 dwYSize;
+        public Int32 dwXCountChars;
+        public Int32 dwYCountChars;
+        public Int32 dwFillAttribute;
+        public Int32 dwFlags;
+        public short wShowWindow;
+        public short cbReserved2;
+        public IntPtr lpReserved2;
+        public IntPtr hStdInput;
+        public IntPtr hStdOutput;
+        public IntPtr hStdError;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct PROCESS_INFORMATION {
+        public IntPtr hProcess;
+        public IntPtr hThread;
+        public Int32 dwProcessId;
+        public Int32 dwThreadId;
+    }
+
+    static void Main(string[] args) {
+        STARTUPINFO startupInfo = new STARTUPINFO();
+        startupInfo.cb = Marshal.SizeOf(startupInfo);
+        PROCESS_INFORMATION processInformation = new PROCESS_INFORMATION();
+
+        CreateProcess(null, "cmd.exe", IntPtr.Zero, IntPtr.Zero, false, 0, IntPtr.Zero, null, ref startupInfo, out processInformation);
+    }
+}
